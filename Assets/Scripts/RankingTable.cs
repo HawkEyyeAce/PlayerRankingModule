@@ -3,115 +3,189 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RankingTable : MonoBehaviour
+namespace Ranking
 {
-    private Transform rankingContainer;
-    private Transform rankingTemplate;
-    private List<Transform> rankingEntryTransformList;
-    // use Unity Script Editor to change ascending value
-    private bool ascending;
-
-    public void Start()
+    public class RankingTable : MonoBehaviour
     {
-        ascending = false;
-    }
+        private static RankingTable instance;
+        private bool ascending;
+        private bool showAllRanks;
+        private int maximumScoreNumbers;
+        private int precision;
 
-    private void Awake()
-    {
-        rankingContainer = GameObject.Find("RankingContainer").transform;
-        rankingTemplate = rankingContainer.Find("RankingTemplate");
+        private Transform rankingContainer;
+        private Transform rankingTemplate;
+        private List<Transform> rankingEntryTransformList;
 
-        rankingTemplate.gameObject.SetActive(false);
-
-        string jsonStr = PlayerPrefs.GetString("rankingTable");
-        Rankings rankings = JsonUtility.FromJson<Rankings>(jsonStr);
-
-        SortRankingScore(rankings.rankingEntryList, ascending);
-
-        rankingEntryTransformList = new List<Transform>();
-        foreach (RankingEntry rankingEntry in rankings.rankingEntryList)
+        private void Start()
         {
-            CreateRankingEntryTransform(rankingEntry, rankingContainer, rankingEntryTransformList);
+            ascending = false;
+            showAllRanks = true;
+            maximumScoreNumbers = 0;
+            precision = 2;
         }
-    }
 
-    private List<RankingEntry> SortRankingScore(List<RankingEntry> rankingEntryList, bool ascending)
-    {
-        if (!ascending)
+        private void Awake()
         {
-            for (int i = 0; i < rankingEntryList.Count; i++)
+            instance = this;
+
+            DrawTables(showAllRanks, maximumScoreNumbers);
+        }
+
+        public void DrawTables(bool var = true, int nb = 0)
+        {
+            rankingContainer = GameObject.Find("RankingContainer").transform;
+            rankingTemplate = rankingContainer.Find("RankingTemplate");
+
+            rankingTemplate.gameObject.SetActive(false);
+
+            string jsonStr = PlayerPrefs.GetString("rankingTable");
+            Rankings rankings = JsonUtility.FromJson<Rankings>(jsonStr);
+
+            rankings.rankingEntryList = SortRankingScore(rankings.rankingEntryList, ascending);
+
+            if (var == false && nb != 0)
             {
-                for (int j = i + 1; j < rankingEntryList.Count; j++)
+                int dataToDelete = rankings.rankingEntryList.Count - nb;
+                if (dataToDelete > 0)
                 {
-                    if (rankingEntryList[j].score > rankingEntryList[i].score)
-                    {
-                        RankingEntry cpy = rankingEntryList[i];
-                        rankingEntryList[i] = rankingEntryList[j];
-                        rankingEntryList[j] = cpy;
-                    }
+                    rankings.rankingEntryList.RemoveRange(nb, dataToDelete);
                 }
             }
-        }
-        else if (ascending)
-        {
-            for (int i = 0; i < rankingEntryList.Count; i++)
+
+            rankingEntryTransformList = new List<Transform>();
+            foreach (RankingEntry rankingEntry in rankings.rankingEntryList)
             {
-                for (int j = i + 1; j < rankingEntryList.Count; j++)
-                {
-                    if (rankingEntryList[j].score < rankingEntryList[i].score)
-                    {
-                        RankingEntry cpy = rankingEntryList[i];
-                        rankingEntryList[i] = rankingEntryList[j];
-                        rankingEntryList[j] = cpy;
-                    }
-                }
+                CreateRankingEntryTransform(rankingEntry, rankingContainer, rankingEntryTransformList, ascending, precision);
             }
         }
 
-        return rankingEntryList;
-    }
-
-    private void CreateRankingEntryTransform(RankingEntry rankingEntry, Transform rankingContainer, List<Transform> transformList)
-    {
-        float rankingTemplateHeight = 30f;
-
-        Transform rankingTransform = Instantiate(rankingTemplate, rankingContainer);
-        RectTransform rankingRectTransform = rankingTransform.GetComponent<RectTransform>();
-        rankingRectTransform.anchoredPosition = new Vector2(0, -rankingTemplateHeight * transformList.Count);
-        rankingTransform.gameObject.SetActive(true);
-
-        int ranking = transformList.Count + 1;
-        switch (ranking)
+        private List<RankingEntry> SortRankingScore(List<RankingEntry> rankingEntryList, bool ascending)
         {
-            default:
-                break;
-            case 1:
-                rankingTransform.Find("GoldMedal").gameObject.SetActive(true);
-                break;
-            case 2:
-                rankingTransform.Find("SilverMedal").gameObject.SetActive(true);
-                break;
-            case 3:
-                rankingTransform.Find("BronzeMedal").gameObject.SetActive(true);
-                break;
-        }
-        rankingTransform.Find("id").GetComponent<Text>().text = ranking.ToString();
+            if (!ascending)
+            {
+                for (int i = 0; i < rankingEntryList.Count; i++)
+                {
+                    for (int j = i + 1; j < rankingEntryList.Count; j++)
+                    {
+                        if (rankingEntryList[j].score > rankingEntryList[i].score)
+                        {
+                            RankingEntry cpy = rankingEntryList[i];
+                            rankingEntryList[i] = rankingEntryList[j];
+                            rankingEntryList[j] = cpy;
+                        }
+                    }
+                }
+            }
+            else if (ascending)
+            {
+                for (int i = 0; i < rankingEntryList.Count; i++)
+                {
+                    for (int j = i + 1; j < rankingEntryList.Count; j++)
+                    {
+                        if (rankingEntryList[j].score < rankingEntryList[i].score)
+                        {
+                            RankingEntry cpy = rankingEntryList[i];
+                            rankingEntryList[i] = rankingEntryList[j];
+                            rankingEntryList[j] = cpy;
+                        }
+                    }
+                }
+            }
 
-        string userID = rankingEntry.userID;
-        rankingTransform.Find("userID").GetComponent<Text>().text = userID;
-
-        int randomScore = rankingEntry.score;
-        rankingTransform.Find("score").GetComponent<Text>().text = randomScore.ToString();
-
-        rankingTransform.Find("background").gameObject.SetActive(ranking % 2 == 1);
-
-        if (ranking == 1 && !ascending)
-        {
-            rankingTransform.Find("id").GetComponent<Text>().color = Color.green;
-            rankingTransform.Find("userID").GetComponent<Text>().color = Color.green;
-            rankingTransform.Find("score").GetComponent<Text>().color = Color.green;
+            return rankingEntryList;
         }
 
-        transformList.Add(rankingTransform);
+        private void CreateRankingEntryTransform(RankingEntry rankingEntry, Transform rankingContainer, List<Transform> transformList, bool ascending, int precision)
+        {
+            float rankingTemplateHeight = 30f;
+
+            Transform rankingTransform = Instantiate(rankingTemplate, rankingContainer);
+            RectTransform rankingRectTransform = rankingTransform.GetComponent<RectTransform>();
+            rankingRectTransform.anchoredPosition = new Vector2(0, -rankingTemplateHeight * transformList.Count);
+            rankingTransform.gameObject.SetActive(true);
+
+            int ranking = transformList.Count + 1;
+            switch (ranking)
+            {
+                default:
+                    break;
+                case 1:
+                    if (!ascending)
+                        rankingTransform.Find("GoldMedal").gameObject.SetActive(true);
+                    break;
+                case 2:
+                    if (!ascending)
+                        rankingTransform.Find("SilverMedal").gameObject.SetActive(true);
+                    break;
+                case 3:
+                    if (!ascending)
+                        rankingTransform.Find("BronzeMedal").gameObject.SetActive(true);
+                    break;
+            }
+            rankingTransform.Find("id").GetComponent<Text>().text = ranking.ToString();
+
+            string userID = rankingEntry.userID;
+            rankingTransform.Find("userID").GetComponent<Text>().text = userID;
+
+            float score = rankingEntry.score;
+            if (precision == 0)
+            {
+                score = Mathf.Round(score);
+            }
+            else
+            {
+                score = Mathf.Round(score * Mathf.Pow(10f, precision)) / Mathf.Pow(10f, precision);
+            }
+            rankingTransform.Find("score").GetComponent<Text>().text = score.ToString();
+
+            rankingTransform.Find("background").gameObject.SetActive(ranking % 2 == 1);
+
+            transformList.Add(rankingTransform);
+        }
+
+        public static RankingTable GetInstance()
+        {
+            return instance;
+        }
+
+        public void UpdateTables(bool var = true, int nb = 0)
+        {
+            foreach (var item in rankingEntryTransformList)
+            {
+                Destroy(item.gameObject);
+            }
+            DrawTables(var, nb);
+        }
+
+        public bool GetAscending()
+        {
+            return ascending;
+        }
+
+        public void SetAscendingAndUpdateRanks(bool ascending)
+        {
+            this.ascending = ascending;
+            UpdateTables();
+        }
+
+        public void SetShowingAllRanks(bool showAllRanks)
+        {
+            this.showAllRanks = showAllRanks;
+            if (showAllRanks)
+                UpdateTables(showAllRanks);
+        }
+
+        public void SetMaximumScoreNumbers(int maximumScoreNumbers)
+        {
+            this.maximumScoreNumbers =  maximumScoreNumbers;
+            UpdateTables(false, maximumScoreNumbers);
+        }
+
+        public void SetPrecisionAndUpdateTables(int precision)
+        {
+            this.precision = precision;
+            UpdateTables();
+        }
     }
 }

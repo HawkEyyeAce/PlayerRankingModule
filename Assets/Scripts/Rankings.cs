@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class Rankings
+namespace Ranking
 {
-    public List<RankingEntry> rankingEntryList;
+    [System.Serializable]
+    public class Rankings
+    {
+        public List<RankingEntry> rankingEntryList;
+    }
 }

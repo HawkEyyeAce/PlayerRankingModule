@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class RankingEntry
+namespace Ranking
 {
-    public string userID;
-    public int score;
+    [System.Serializable]
+    public class RankingEntry
+    {
+        public string userID;
+        public float score;
+    }
 }
