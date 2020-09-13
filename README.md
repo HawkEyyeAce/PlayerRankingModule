@@ -3,6 +3,7 @@
 I spent approximately 10 hours on this part for development and testing.
 I spend some time on message and logging system, in order to avoid security issues and bugs that would crash the application.
 Testing (connection with server with correct request and database parameters) took a significant amount of time.
+I tried to make the mobile format quite responsive and to setup a scroll bar.
 
 Technical choices :
 I used UnityWebRequest (UnityEngine.Networking) to send request and communicate with NodeJS server.
