@@ -24,7 +24,9 @@ namespace Ranking
         readonly string postURL = "http://localhost:8080/rankings/";
         readonly string deleteURL = "http://localhost:8080/rankings/userID/";
 
-        private Regex rgx = new Regex("[a-zA-Z0-9]*");
+        private Regex rgx = new Regex("[a-zA-Z0-9]");
+        private char[] badChars = { '[', ']', '{', '}', '!', '@', '#', '$', '%', '.', '&', '*',
+            '(', ')', '\"', '\'', '-', '_', '=', '+', '-', '*', '/' };
 
         int precision;
 
@@ -43,15 +45,26 @@ namespace Ranking
             return instancePrecision;
         }
 
+        private void Update()
+        {
+            // only alphabets are allowed in the userID inputfield
+            userID.contentType = InputField.ContentType.Name;
+            userIDToGetScore.contentType = InputField.ContentType.Name;
+            userIDToDelete.contentType = InputField.ContentType.Name;
+        }
+
         public void OnButtonSendScore()
         {
+            // only alphabets are allowed in the userID inputfield
+            userID.contentType = InputField.ContentType.Name;
+
             if (userID.text == string.Empty)
             {
                 message.GetComponent<Text>().color = Color.red;
                 message.GetComponent<Text>().fontSize = 25;
                 message.text = "Error: No userID to send.\nEnter a value in the input field.";
             }
-            else if (!rgx.Match(userID.text).Success)
+            else if (userID.text.IndexOfAny(badChars) > 0)
             {
                 message.GetComponent<Text>().color = Color.red;
                 message.GetComponent<Text>().fontSize = 25;
@@ -95,6 +108,12 @@ namespace Ranking
                 message.GetComponent<Text>().fontSize = 25;
                 message.text = "Error: No userID to send.\nEnter a value in the input field.";
             }
+            else if (userIDToGetScore.text.IndexOfAny(badChars) > 0)
+            {
+                message.GetComponent<Text>().color = Color.red;
+                message.GetComponent<Text>().fontSize = 25;
+                message.text = "Error: Invalid userID format.\nEnter a correct value in the input field.";
+            }
             else
             {
                 message.GetComponent<Text>().color = Color.white;
@@ -112,6 +131,12 @@ namespace Ranking
                 message.GetComponent<Text>().color = Color.red;
                 message.GetComponent<Text>().fontSize = 25;
                 message.text = "Error: No userID to send.\nEnter a value in the input field.";
+            }
+            else if (userIDToDelete.text.IndexOfAny(badChars) > 0)
+            {
+                message.GetComponent<Text>().color = Color.red;
+                message.GetComponent<Text>().fontSize = 25;
+                message.text = "Error: Invalid userID format.\nEnter a correct value in the input field.";
             }
             else
             {
