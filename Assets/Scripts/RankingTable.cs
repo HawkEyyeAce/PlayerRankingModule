@@ -166,7 +166,7 @@ namespace Ranking
         public void SetAscendingAndUpdateRanks(bool ascending)
         {
             this.ascending = ascending;
-            UpdateTables();
+            UpdateTables(showAllRanks, maximumScoreNumbers);
         }
 
         public void SetShowingAllRanks(bool showAllRanks)
@@ -185,7 +185,7 @@ namespace Ranking
         public void SetPrecisionAndUpdateTables(int precision)
         {
             this.precision = precision;
-            UpdateTables();
+            UpdateTables(showAllRanks, maximumScoreNumbers);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Ranking
         [MenuItem("Window/OptionalFunctions")]
         public static void ShowWindow()
         {
-            EditorWindow.GetWindow<CustomEditorWindow>("OptionalFunctions");
+            GetWindow<CustomEditorWindow>("OptionalFunctions");
         }
 
         private void OnGUI()
@@ -62,7 +62,7 @@ namespace Ranking
 
                 if (EditorApplication.isPlaying && SceneManager.GetActiveScene().name == "Page2")
                 {
-                    RankingTable.GetInstance().SetShowingAllRanks(!activeMaximumScoreNumbers);
+                    RankingTable.GetInstance().SetShowingAllRanks(activeMaximumScoreNumbers);
                     RankingTable.GetInstance().SetMaximumScoreNumbers(maximumScoreNumbers);
                 }
             }
