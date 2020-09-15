@@ -81,11 +81,8 @@ namespace Ranking
                     //Debug.Log(SceneManager.GetActiveScene().name);
                 }
 
-                else if (SceneManager.GetActiveScene().name == "Page1")
-                {
-                    UnityWebRequestScript.GetInstance().SetPrecision(precision);
-                    //Debug.Log(SceneManager.GetActiveScene().name);
-                }
+                UnityWebRequestScript.Instance.SetPrecision(precision);
+                //Debug.Log(SceneManager.GetActiveScene().name);
             }
         }
     }

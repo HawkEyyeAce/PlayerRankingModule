@@ -6,12 +6,13 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine.SceneManagement;
 
 namespace Ranking
 {
     public class UnityWebRequestScript : MonoBehaviour
     {
-        private static UnityWebRequestScript instancePrecision;
+        private static UnityWebRequestScript m_instancePrecision;
 
         public Text message;
         public InputField userID;
@@ -30,17 +31,28 @@ namespace Ranking
 
         private void Start()
         {
-            message.text = "Press buttons to interacts with web server";
+            if (SceneManager.GetActiveScene().name == "Page1")
+                message.text = "Press buttons to interacts with web server";
         }
 
-        private void Awake()
+        public static UnityWebRequestScript Instance
         {
-            instancePrecision = this;
-        }
+            get
+            {
+                if (m_instancePrecision == null)
+                {
+                    m_instancePrecision = (UnityWebRequestScript) FindObjectOfType(typeof(UnityWebRequestScript));
+                    if (m_instancePrecision == null)
+                    {
+                        var singletonObject = new GameObject("UnityWebRequestScriptSingleton");
+                        m_instancePrecision = singletonObject.AddComponent<UnityWebRequestScript>();
 
-        public static UnityWebRequestScript GetInstance()
-        {
-            return instancePrecision;
+                        DontDestroyOnLoad(singletonObject);
+                    }
+                }
+
+                return m_instancePrecision;
+            }
         }
 
         public void OnButtonSendScore()
@@ -245,10 +257,7 @@ namespace Ranking
 
                     float scoreReceived = rank.score;
 
-                    if (UnityEditor.EditorApplication.isPlaying)
-                        precision = GetInstance().GetPrecision();
-                    else
-                        precision = 4;
+                    precision = Instance.GetPrecision();
 
                     if (precision == 0)
                     {
