@@ -50,8 +50,11 @@ namespace Ranking
                 if (dataToDelete > 0)
                 {
                     rankings.rankingEntryList.RemoveRange(nb, dataToDelete);
+                    Debug.Log("data To Delete " + dataToDelete);
                 }
             }
+
+            Debug.Log(rankings.rankingEntryList.Count);
 
             rankingEntryTransformList = new List<Transform>();
             foreach (RankingEntry rankingEntry in rankings.rankingEntryList)
@@ -154,7 +157,9 @@ namespace Ranking
             foreach (var item in rankingEntryTransformList)
             {
                 Destroy(item.gameObject);
+                Debug.Log("gameObject" + item + "destroyed");
             }
+            //Debug.Log("Draw tables" + var + " " + nb);
             DrawTables(var, nb);
         }
 
@@ -166,7 +171,7 @@ namespace Ranking
         public void SetAscendingAndUpdateRanks(bool ascending)
         {
             this.ascending = ascending;
-            UpdateTables();
+            UpdateTables(showAllRanks, maximumScoreNumbers);
         }
 
         public void SetShowingAllRanks(bool showAllRanks)
@@ -185,7 +190,7 @@ namespace Ranking
         public void SetPrecisionAndUpdateTables(int precision)
         {
             this.precision = precision;
-            UpdateTables();
+            UpdateTables(showAllRanks, maximumScoreNumbers);
         }
     }
 }

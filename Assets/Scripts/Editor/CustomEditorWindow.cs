@@ -19,10 +19,12 @@ namespace Ranking
         public string[] digitOptionsStr = new string[] { "0", "0.1", "0.01", "0.001", "0.0001" };
         public int[] digitOptionsInt = new int[] { 0, 1, 2, 3, 4 };
 
+        bool adminRights = false;
+
         [MenuItem("Window/OptionalFunctions")]
         public static void ShowWindow()
         {
-            EditorWindow.GetWindow<CustomEditorWindow>("OptionalFunctions");
+            GetWindow<CustomEditorWindow>("OptionalFunctions");
         }
 
         private void OnGUI()
@@ -62,7 +64,7 @@ namespace Ranking
 
                 if (EditorApplication.isPlaying && SceneManager.GetActiveScene().name == "Page2")
                 {
-                    RankingTable.GetInstance().SetShowingAllRanks(!activeMaximumScoreNumbers);
+                    RankingTable.GetInstance().SetShowingAllRanks(activeMaximumScoreNumbers);
                     RankingTable.GetInstance().SetMaximumScoreNumbers(maximumScoreNumbers);
                 }
             }
@@ -84,6 +86,11 @@ namespace Ranking
                 UnityWebRequestScript.Instance.SetPrecision(precision);
                 //Debug.Log(SceneManager.GetActiveScene().name);
             }
+
+            EditorGUILayout.Space();
+
+            adminRights = EditorGUILayout.Toggle("Admin rights", adminRights);
+            UnityWebRequestScript.Instance.SetAdminRights(adminRights);
         }
     }
 }

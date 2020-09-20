@@ -19,6 +19,7 @@ namespace Ranking
         public InputField score;
         public InputField userIDToGetScore;
         public InputField userIDToDelete;
+        public GameObject adminRightsTemplate;
 
         readonly string getURL = "http://localhost:8080/rankings/";
         readonly string getUserIDURL = "http://localhost:8080/rankings/userID/";
@@ -28,6 +29,7 @@ namespace Ranking
         private Regex rgx = new Regex("[a-zA-Z0-9]*");
 
         int precision;
+        bool adminRights;
 
         private void Start()
         {
@@ -325,6 +327,20 @@ namespace Ranking
         public int GetPrecision()
         {
             return precision;
+        }
+
+        public void SetAdminRights(bool adminRights)
+        {
+            this.adminRights = adminRights;
+            if (adminRights)
+                adminRightsTemplate.SetActive(true);
+            else
+                adminRightsTemplate.SetActive(false);
+        }
+
+        public bool GetAdminRights()
+        {
+            return adminRights;
         }
     }
 }
